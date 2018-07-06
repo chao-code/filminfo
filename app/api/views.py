@@ -45,7 +45,10 @@ def get_film(film_id):
     if cache.exists(key):
         film = json.loads(cache.get(key))
     else:
-        page = requests.get(f'{_OMDB}&i={film_id}&plot=full')
+        try:
+            page = requests.get(f'{_OMDB}&i={film_id}&plot=full', timeout=10)
+        except requests.exceptions.Timeout:
+            abort(500)
         film = page.json()
         if not film.get('Response') == 'True':
             abort(404)
